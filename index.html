@@ -84,23 +84,19 @@
         </div>
         <p class="text-gray-500 mb-6 -mt-2">Demonstrating Zero Trust Governance, Scalable Hosting, and Auditable Workflows.</p>
 
-        <!-- Tab Navigation -->
         <div class="flex space-x-2 md:space-x-4 border-b pb-1 mb-6">
             <button class="tab-button px-4 py-2 text-sm rounded-t-lg border-b-2 border-transparent active" data-tab="studio">1. Agent Creation Studio</button>
             <button class="tab-button px-4 py-2 text-sm rounded-t-lg border-b-2 border-transparent" data-tab="chat" disabled>2. Order Agent</button>
             <button class="tab-button px-4 py-2 text-sm rounded-t-lg border-b-2 border-transparent" data-tab="dashboard" disabled>3. Runtime Dashboard (Audit-ability)</button>
         </div>
 
-        <!-- Tab Content -->
         <div id="tab-content">
-            <!-- Studio Tab Content -->
             <div id="studio" class="tab-pane">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Demo 1: The Golden Path (Fast Time-to-Market)</h2>
                 <div class="bg-gray-50 p-6 rounded-lg border">
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         
-                        <!-- Left Pane: Wizard Steps -->
                         <div class="col-span-1 space-y-2">
                             <div id="step-name-badge" class="wizard-step active p-3 rounded-lg shadow-md cursor-pointer" onclick="showStep(1)">
                                 <span class="font-bold">Step 1: Define Agent</span> - Name & Goal
@@ -122,11 +118,9 @@
                             </div>
                         </div>
 
-                        <!-- Center Pane: Step Content -->
                         <div class="col-span-2">
                             <h3 class="text-lg font-medium mb-4 text-indigo-700" id="wizard-title">Step 1: Define Agent - Name & Goal</h3>
                             
-                            <!-- Step 1: Define Agent -->
                             <div id="step-1" class="wizard-content space-y-4">
                                 <label class="block">
                                     <span class="text-gray-700">Agent Type</span>
@@ -154,7 +148,6 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                                 </button>
                             </div>
                             
-                            <!-- Step 2: Configure Memory -->
                             <div id="step-2" class="wizard-content hidden space-y-4">
                                 <p class="text-sm text-gray-600">Select the type of short-term memory (contextual memory) this agent requires.</p>
                                 <label class="block">
@@ -173,7 +166,6 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                                 </button>
                             </div>
 
-                            <!-- Step 3: Add Knowledge Base (Updated for RAG Document Upload & Graph DB) -->
                             <div id="step-3" class="wizard-content hidden space-y-4">
                                 <p class="text-sm text-gray-600">Select a knowledge source for Retrieval-Augmented Generation (RAG).</p>
                                 <label class="block">
@@ -188,7 +180,14 @@ Rule: MUST use affirmative sentences when responding.</textarea>
 
                                 <div class="bg-white p-4 rounded-md border border-gray-200 mt-4 space-y-3">
                                     <h4 class="font-semibold text-gray-700">Data Injection Demo</h4>
-                                    <p class="text-xs text-gray-600">Upload internal policy documents (e.g., Markdown or PDF) to populate the selected database. This creates the embeddings used for RAG.</p>
+                                    
+                                    <div class="flex justify-between items-end">
+                                        <p class="text-xs text-gray-600">Upload internal policy documents (Markdown/PDF) to populate the database.</p>
+                                        <button onclick="downloadSampleFAQ()" class="text-xs text-indigo-600 hover:text-indigo-800 underline font-semibold flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                            Download Sample FAQ
+                                        </button>
+                                    </div>
                                     
                                     <input type="file" id="document-upload" accept=".pdf,.txt,.md" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" />
                                     
@@ -208,7 +207,6 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                                 </button>
                             </div>
                             
-                            <!-- Step 4: Define Workflow (New Workflow Builder for Multi-Agent) -->
                             <div id="step-4" class="wizard-content hidden space-y-4">
                                 <p class="text-sm text-gray-600 mb-4">Define a multi-step workflow. This demonstrates the orchestration of multiple services (**Argo Workflows** logic).</p>
                                 
@@ -259,7 +257,6 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                                 </button>
                             </div>
 
-                            <!-- Step 5: Set Policy -->
                             <div id="step-5" class="wizard-content hidden space-y-4">
                                 <p class="text-sm text-gray-600">Define the security guardrail. This choice automatically generates the **OPA Rego Policy** that prevents misuse or injection attacks.</p>
                                 <label class="block">
@@ -286,7 +283,6 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                                 </button>
                             </div>
 
-                            <!-- Step 6: Review & Deploy -->
                             <div id="step-6" class="wizard-content hidden space-y-4">
                                 <h4 class="font-medium text-gray-700">Deployment Status (Golden Path)</h4>
                                 <p class="text-sm text-gray-600">Review complete. Clicking "Deploy" commits the configuration (K8s Manifest, OPA Policy, Vault Secrets) to Git, initiating the automated pipeline.</p>
@@ -304,7 +300,6 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                 </div>
             </div>
 
-            <!-- Chat Tab Content -->
             <div id="chat" class="tab-pane hidden">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">2. Order Agent</h2>
                 <div class="bg-gray-50 p-6 rounded-lg border h-[400px] flex flex-col">
@@ -325,12 +320,10 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                 </div>
             </div>
 
-            <!-- Dashboard Tab Content -->
             <div id="dashboard" class="tab-pane hidden">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">3. Runtime Dashboard (Audit-ability)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
-                    <!-- Policy Violation Log (OPA) -->
                     <div class="bg-red-50 p-4 rounded-lg border border-red-300">
                         <h3 class="font-bold text-red-700 mb-3 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
@@ -341,7 +334,6 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                         </div>
                     </div>
 
-                    <!-- Distributed Trace (Jaeger) -->
                     <div class="bg-blue-50 p-4 rounded-lg border border-blue-300">
                         <h3 class="font-bold text-blue-700 mb-3 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0 7 7 0 01-14 0zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" /></svg>
@@ -352,7 +344,6 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                         </div>
                     </div>
 
-                    <!-- FinOps/Metrics Panel -->
                     <div class="md:col-span-2 bg-yellow-50 p-4 rounded-lg border border-yellow-300 mt-4">
                         <h3 class="font-bold text-yellow-700 mb-3 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 01-8 8zm0-2.015a8 8 0 01-.059 8.015H2V7.985z" /></svg>
@@ -554,7 +545,40 @@ Rule: MUST use affirmative sentences when responding.</textarea>
         }
         // -----------------------
         
-        // --- STEP 3: RAG DOCUMENT UPLOAD LOGIC ---
+        // --- STEP 3: RAG DOCUMENT UPLOAD & DOWNLOAD LOGIC ---
+        
+        // NEW: Generate Sample File for Download
+        function downloadSampleFAQ() {
+            const content = `# Customer Support FAQ & Policy Document
+
+## 1. Return Policy
+**Q: What is the return window?**
+A: Items can be returned within 30 days of receipt.
+
+**Q: Are there restocking fees?**
+A: Yes, a 10% restocking fee applies to open box items.
+
+## 2. Shipping
+**Q: What is the holiday shipping cutoff?**
+A: To ensure delivery by Dec 25th, orders must be placed by 3 PM EST on December 18th.
+
+## 3. Account
+**Q: How do I delete my account?**
+A: Account deletion requests must be submitted via the Secure Portal. Agents cannot delete accounts directly.`;
+
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            
+            // Create temporary link and click it
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'customer_support_faq.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
         document.getElementById('document-upload')?.addEventListener('change', (e) => {
             const uploadButton = document.getElementById('upload-button');
             if (e.target.files.length > 0) {
@@ -678,7 +702,7 @@ Rule: MUST use affirmative sentences when responding.</textarea>
                     
                     // Explicitly showing the association and methods available to the agent
                     preview.innerHTML = `<span class="font-bold text-gray-800">API Spec (OpenAPI) for ${toolName}:</span><br>` +
-                                        `<code class="text-gray-600">GET /api/v1/orders/status: Retrieve order tracking info.<br>POST /api/v1/orders/delete: Delete order record (requires FULL_ACCESS).<br>GET /api/v1/orders/analytics: Retrieve aggregated business metrics (e.g., total orders).</code>`;
+                                            `<code class="text-gray-600">GET /api/v1/orders/status: Retrieve order tracking info.<br>POST /api/v1/orders/delete: Delete order record (requires FULL_ACCESS).<br>GET /api/v1/orders/analytics: Retrieve aggregated business metrics (e.g., total orders).</code>`;
                     preview.classList.remove('hidden');
                     
                 } else {
