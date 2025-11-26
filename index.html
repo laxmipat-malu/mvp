@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progenix.ai - Agentic Platform MVP Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; }
+        .tab-button.active { border-color: #4f46e5; color: #4f46e5; background-color: #eef2ff; font-weight: 600; }
+        .log-success { color: #10b981; }
+        .log-deny { color: #ef4444; font-weight: 600; }
+        .log-vault { color: #f97316; }
+        .log-istio { color: #3b82f6; }
+        .log-sql { color: #84cc16; } 
+        .log-graph { color: #eab308; } 
+        .log-multi-agent { color: #9333ea; } 
+        .trace-span { transition: all 0.7s ease-out; } /* Smoother transition for better visual effect */
+        .wizard-step.active { background-color: #4f46e5; color: white; }
+        .wizard-step.completed { background-color: #10b981; color: white; }
+        .wizard-step { transition: background-color 0.3s, color 0.3s; }
+        .hidden { display: none; }
+        .blueprint-code {
+            background-color: #262626;
+            color: #10b981;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 10px;
+            font-size: 10px;
+        }
+        .trace-entry {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .trace-label {
+            width: 38%; /* Fixed width for labels */
+            font-size: 10px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 5px;
+        }
+        .trace-bar-container {
+            flex-grow: 1;
+            height: 16px;
+            background-color: #f3f4f6;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .trace-bar {
+            height: 100%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 4px;
+            font-size: 8px;
+            font-weight: 600;
+            color: white;
+            transition: width 0.7s ease-out;
+        }
+        
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-2xl p-6 md:p-8">
+        
+        <div class="flex justify-between items-center mb-4 border-b pb-2">
+            <h1 class="text-3xl font-bold text-gray-800">Progenix.ai - Agentic Platform MVP - Showcase Features</h1>
+            <button onclick="resetDemo()" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-150 shadow-md flex items-center text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.101 7H7a1 1 0 110 2H3a1 1 0 01-1-1V4a1 1 0 011-1h1zm12 14a1 1 0 00-.966-.742 7.002 7.002 0 01-11.601-2.566 1 1 0 101.885-.666A5.002 5.002 0 0014.899 13H13a1 1 0 100 2h4a1 1 0 001-1v-4a1 1 0 10-2 0v2.101z" clip-rule="evenodd" />
+                </svg>
+                Reset Demo
+            </button>
+        </div>
+        <p class="text-gray-500 mb-6 -mt-2">Demonstrating Zero Trust Governance, Scalable Hosting, and Auditable Workflows.</p>
+
+        <!-- Tab Navigation -->
+        <div class="flex space-x-2 md:space-x-4 border-b pb-1 mb-6">
+            <button class="tab-button px-4 py-2 text-sm rounded-t-lg border-b-2 border-transparent active" data-tab="studio">1. Agent Creation Studio</button>
+            <button class="tab-button px-4 py-2 text-sm rounded-t-lg border-b-2 border-transparent" data-tab="chat" disabled>2. Order Agent</button>
+            <button class="tab-button px-4 py-2 text-sm rounded-t-lg border-b-2 border-transparent" data-tab="dashboard" disabled>3. Runtime Dashboard (Audit-ability)</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="tab-content">
+            <!-- Studio Tab Content -->
+            <div id="studio" class="tab-pane">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Demo 1: The Golden Path (Fast Time-to-Market)</h2>
+                <div class="bg-gray-50 p-6 rounded-lg border">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <!-- Left Pane: Wizard Steps -->
+                        <div class="col-span-1 space-y-2">
+                            <div id="step-name-badge" class="wizard-step active p-3 rounded-lg shadow-md cursor-pointer" onclick="showStep(1)">
+                                <span class="font-bold">Step 1: Define Agent</span> - Name & Goal
+                            </div>
+                            <div id="step-memory-badge" class="wizard-step p-3 rounded-lg shadow-md cursor-pointer" onclick="showStep(2)">
+                                <span class="font-bold">Step 2: Configure Memory</span> - State & Context
+                            </div>
+                             <div id="step-knowledge-badge" class="wizard-step p-3 rounded-lg shadow-md cursor-pointer" onclick="showStep(3)">
+                                <span class="font-bold">Step 3: Add Knowledge Base</span> - RAG/Vector DB
+                            </div>
+                            <div id="step-tool-badge" class="wizard-step p-3 rounded-lg shadow-md cursor-pointer" onclick="showStep(4)">
+                                <span class="font-bold">Step 4: Define Workflow</span> - Multi-Step Logic
+                            </div>
+                            <div id="step-policy-badge" class="wizard-step p-3 rounded-lg shadow-md cursor-pointer" onclick="showStep(5)">
+                                <span class="font-bold">Step 5: Set Policy</span> - Governance Guardrail (OPA)
+                            </div>
+                            <div id="step-deploy-badge" class="wizard-step p-3 rounded-lg shadow-md cursor-not-allowed">
+                                <span class="font-bold">Step 6: Deploy</span> - Initiate Golden Path
+                            </div>
+                        </div>
+
+                        <!-- Center Pane: Step Content -->
+                        <div class="col-span-2">
+                            <h3 class="text-lg font-medium mb-4 text-indigo-700" id="wizard-title">Step 1: Define Agent - Name & Goal</h3>
+                            
+                            <!-- Step 1: Define Agent -->
+                            <div id="step-1" class="wizard-content space-y-4">
+                                <label class="block">
+                                    <span class="text-gray-700">Agent Type</span>
+                                    <select id="agent-type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
+                                        <option value="SingleAgent">Single Agent (Default)</option>
+                                        <option value="MultiAgent">Manager/Multi-Agent (Collaborative Workflow)</option>
+                                    </select>
+                                </label>
+                                <label class="block">
+                                    <span class="text-gray-700">Agent Name</span>
+                                    <input type="text" id="agent-name" value="Order Status Agent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white" readonly>
+                                </label>
+                                <label class="block">
+                                    <span class="text-gray-700">Agent Goal</span>
+                                    <textarea id="agent-goal" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white h-20" readonly>Provide real-time status updates for customer orders by querying the Order Lookup Service.</textarea>
+                                </label>
+                                <label class="block">
+                                    <span class="text-gray-700 font-semibold">Agent Instructions (Persona/Tone)</span>
+                                    <textarea id="agent-instructions" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white h-24" readonly>Role: A professional and efficient customer service bot.
+Tone: Always helpful and optimistic.
+Rule: MUST use affirmative sentences when responding.</textarea>
+                                </label>
+                                <button onclick="nextStep()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md float-right">
+                                    Next: Configure Memory
+                                </button>
+                            </div>
+                            
+                            <!-- Step 2: Configure Memory -->
+                            <div id="step-2" class="wizard-content hidden space-y-4">
+                                <p class="text-sm text-gray-600">Select the type of short-term memory (contextual memory) this agent requires.</p>
+                                <label class="block">
+                                    <span class="text-gray-700">Short-Term Memory Storage (Context)</span>
+                                    <select id="memory-selection" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
+                                        <option value="Redis">Redis Cache (High-Speed Context)</option>
+                                        <option value="In-Process">In-Process Memory (Minimal)</option>
+                                    </select>
+                                    <p class="text-xs text-green-600 mt-1">Maps to a dedicated **Redis** instance deployed via StatefulSet.</p>
+                                </label>
+                                <button onclick="showStep(1)" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
+                                    Back
+                                </button>
+                                <button onclick="nextStep()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md float-right">
+                                    Next: Add Knowledge Base
+                                </button>
+                            </div>
+
+                            <!-- Step 3: Add Knowledge Base (Updated for RAG Document Upload & Graph DB) -->
+                            <div id="step-3" class="wizard-content hidden space-y-4">
+                                <p class="text-sm text-gray-600">Select a knowledge source for Retrieval-Augmented Generation (RAG).</p>
+                                <label class="block">
+                                    <span class="text-gray-700">Knowledge Base Source (RAG)</span>
+                                    <select id="knowledge-selection" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
+                                        <option value="VectorDB">Customer FAQs (Vector DB - ChromaDB/Weaviate)</option>
+                                        <option value="GraphDB">Supply Chain Relations (Graph DB - Neo4j)</option>
+                                        <option value="None">None (Pure Tool Use)</option>
+                                    </select>
+                                    <p class="text-xs text-green-600 mt-1">Select VectorDB for policy lookups (RAG Demo) or GraphDB for analytical/relational queries (Graph RAG Demo).</p>
+                                </label>
+
+                                <div class="bg-white p-4 rounded-md border border-gray-200 mt-4 space-y-3">
+                                    <h4 class="font-semibold text-gray-700">Data Injection Demo</h4>
+                                    <p class="text-xs text-gray-600">Upload internal policy documents (e.g., Markdown or PDF) to populate the selected database. This creates the embeddings used for RAG.</p>
+                                    
+                                    <input type="file" id="document-upload" accept=".pdf,.txt,.md" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" />
+                                    
+                                    <button id="upload-button" onclick="simulateDocumentUpload()" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150 shadow-md text-sm flex items-center disabled:opacity-50" disabled>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M5.5 13a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM12 4a3 3 0 100 6 3 3 0 000-6zM13.5 13a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM10 18a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd" fill-rule="evenodd" /></svg>
+                                        Upload & Generate Embeddings
+                                    </button>
+                                    <div id="upload-status" class="text-xs mt-2 text-gray-500">Awaiting file selection...</div>
+                                </div>
+
+
+                                <button onclick="showStep(2)" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
+                                    Back
+                                </button>
+                                <button onclick="nextStep()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md float-right">
+                                    Next: Define Workflow
+                                </button>
+                            </div>
+                            
+                            <!-- Step 4: Define Workflow (New Workflow Builder for Multi-Agent) -->
+                            <div id="step-4" class="wizard-content hidden space-y-4">
+                                <p class="text-sm text-gray-600 mb-4">Define a multi-step workflow. This demonstrates the orchestration of multiple services (**Argo Workflows** logic).</p>
+                                
+                                <label class="block">
+                                    <span class="text-gray-700 font-semibold">Microservice Workflow Logic</span>
+                                    <textarea id="workflow-logic" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white h-32" readonly>1. Call Order Lookup Service (GET /status)
+2. IF Status == 'Shipped' AND Time > 10 Days
+3. THEN Call External Email Service (POST /send-update)
+4. ELSE Return Status to User.</textarea>
+                                    <p class="text-xs text-green-600 mt-1">Simulates Argo Workflows logic chaining Microservices and conditional decision-making.</p>
+                                </label>
+
+                                <div class="bg-white p-4 rounded-md border border-gray-200 mt-4">
+                                    <h4 class="font-semibold text-gray-700 flex items-center mb-2">Reporting Output Configuration</h4>
+                                    <label class="block">
+                                        <span class="text-gray-700">Required Output Format</span>
+                                        <select id="output-format" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
+                                            <option value="EXCEL">Excel (.csv) - Structured Data</option>
+                                            <option value="PPT">PowerPoint (.pptx) - Presentation Ready</option>
+                                            <option value="JSON">JSON (API Response)</option>
+                                        </select>
+                                        <p class="text-xs text-green-600 mt-1">Maps to **Report Generation Service** tool.</p>
+                                    </label>
+                                </div>
+
+                                <div class="bg-white p-4 rounded-md border border-gray-200 mt-4">
+                                    <h4 class="font-semibold text-gray-700 flex items-center mb-2">
+                                        Tool Connectivity Check
+                                        <span id="connection-status" class="ml-2 px-2 py-0.5 text-xs rounded-full bg-yellow-100 text-yellow-700">Awaiting Check</span>
+                                    </h4>
+                                    <button id="check-connection-button" onclick="checkToolConnection()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150 shadow-md text-sm flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 animate-pulse hidden" id="spinner" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v2a1 1 0 11-2 0V4a1 1 0 011-1zm0 14a1 1 0 01-1 1v-2a1 1 0 112 0v2a1 1 0 01-1 1zm0-10a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zm6.293 2.293a1 1 0 01-1.414 0l-1.414-1.414a1 1 0 111.414-1.414l1.414 1.414a1 1 0 010 1.414zM4.414 14.293a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414l-1.414 1.414a1 1 0 01-1.414 0zM14.293 15.586a1 1 0 01-1.414 0l-1.414-1.414a1 1 0 111.414-1.414l1.414 1.414a1 1 0 010 1.414zM5.586 4.414a1 1 0 010 1.414l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                        Check Connection & Pull API Spec
+                                    </button>
+
+                                    <div id="api-spec-preview" class="mt-3 p-2 bg-gray-100 rounded-md border text-xs h-20 overflow-y-auto hidden">
+                                        <span class="font-bold text-gray-800">API Spec (OpenAPI):</span><br>
+                                        <code class="text-gray-600">GET /api/v1/orders/status: Retrieve order tracking info.<br>POST /api/v1/orders/delete: Delete order record (requires FULL_ACCESS).<br>GET /api/v1/orders/analytics: Retrieve aggregated business metrics (e.g., total orders).</code>
+                                    </div>
+                                </div>
+
+
+                                <button onclick="showStep(3)" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
+                                    Back
+                                </button>
+                                <button onclick="nextStep()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md float-right">
+                                    Next: Set Policy
+                                </button>
+                            </div>
+
+                            <!-- Step 5: Set Policy -->
+                            <div id="step-5" class="wizard-content hidden space-y-4">
+                                <p class="text-sm text-gray-600">Define the security guardrail. This choice automatically generates the **OPA Rego Policy** that prevents misuse or injection attacks.</p>
+                                <label class="block">
+                                    <span class="text-gray-700 font-semibold">Access Level (Policy Guardrail)</span>
+                                    <select id="access-level" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
+                                        <option value="READ_ONLY">READ_ONLY (GET/Status, GET/Analytics)</option>
+                                        <option value="FULL_ACCESS">FULL_ACCESS (GET/POST/DELETE)</option>
+                                    </select>
+                                    <p class="text-xs text-red-500 mt-1">We recommend READ_ONLY to minimize risk for this agent type.</p>
+                                </label>
+                                
+                                <div id="policy-preview" class="bg-white p-3 rounded-md border border-gray-200 h-24 overflow-y-auto text-xs text-gray-700">
+                                    <span class="font-bold text-sm">OPA Rego Policy Preview:</span><br>
+                                    `package progenix.security` <br>
+                                    `default allow = false` <br>
+                                    `allow { input.method = "GET" }`
+                                </div>
+
+                                <button onclick="showStep(4)" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
+                                    Back
+                                </button>
+                                <button onclick="nextStep()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md float-right">
+                                    Next: Review & Deploy
+                                </button>
+                            </div>
+
+                            <!-- Step 6: Review & Deploy -->
+                            <div id="step-6" class="wizard-content hidden space-y-4">
+                                <h4 class="font-medium text-gray-700">Deployment Status (Golden Path)</h4>
+                                <p class="text-sm text-gray-600">Review complete. Clicking "Deploy" commits the configuration (K8s Manifest, OPA Policy, Vault Secrets) to Git, initiating the automated pipeline.</p>
+
+                                <div id="deployment-log" class="bg-white p-3 rounded-md h-40 overflow-y-auto text-xs border border-gray-200">
+                                    <p class="text-gray-400">Review configuration and initiate deployment...</p>
+                                </div>
+                                <button id="deploy-button" onclick="deployAgent()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
+                                    Initiate Golden Path Deployment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Chat Tab Content -->
+            <div id="chat" class="tab-pane hidden">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">2. Order Agent</h2>
+                <div class="bg-gray-50 p-6 rounded-lg border h-[400px] flex flex-col">
+                    <div id="chat-window" class="flex-grow overflow-y-auto space-y-4 p-2 mb-4 bg-white rounded-md border">
+                        <div class="text-sm text-center text-gray-500">Agent is active. Try a query below.</div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <input type="text" id="user-query" placeholder="Ask the agent a question (e.g., Where is my order? or Total orders last 6 months?)" class="flex-grow rounded-md border-gray-300 shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500">
+                        <button onclick="sendQuery()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-150 shadow-md">
+                            Send
+                        </button>
+                        <button onclick="injectContext()" id="context-button" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg transition duration-150 shadow-md text-sm flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm12 6a1 1 0 11-2 0 1 1 0 012 0zm-5 4.5a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" /></svg>
+                            Inject Context
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Recommended Demos: "Where is my order?" (Tool Use), **"Can you delete my order?" (Instructions & Policy)**, "What is the refund policy?" (RAG Use), "Where are the new delivery zones?" (Learning Loop), or "Total orders last 6 months?" (SQL Query). **After Inject Context, ask: "What is the shipping cutoff?"**</p>
+                </div>
+            </div>
+
+            <!-- Dashboard Tab Content -->
+            <div id="dashboard" class="tab-pane hidden">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">3. Runtime Dashboard (Audit-ability)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Policy Violation Log (OPA) -->
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-300">
+                        <h3 class="font-bold text-red-700 mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
+                            OPA Policy Violation Log
+                        </h2>
+                        <div id="opa-log" class="bg-white p-3 rounded-md h-40 overflow-y-auto text-xs border">
+                            <p class="text-gray-400">Awaiting policy violation events...</p>
+                        </div>
+                    </div>
+
+                    <!-- Distributed Trace (Jaeger) -->
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-300">
+                        <h3 class="font-bold text-blue-700 mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0 7 7 0 01-14 0zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" /></svg>
+                            End-to-End Trace (Jaeger)
+                        </h3>
+                        <div id="jaeger-trace" class="bg-white p-3 rounded-md h-40 text-xs border space-y-1">
+                            <p class="text-gray-400">Run a successful query in the Chat tab to see a trace.</p>
+                        </div>
+                    </div>
+
+                    <!-- FinOps/Metrics Panel -->
+                    <div class="md:col-span-2 bg-yellow-50 p-4 rounded-lg border border-yellow-300 mt-4">
+                        <h3 class="font-bold text-yellow-700 mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 01-8 8zm0-2.015a8 8 0 01-.059 8.015H2V7.985z" /></svg>
+                            FinOps / Core Metrics (Grafana Simulation)
+                        </h3>
+                        <div class="flex justify-around text-center">
+                            <div>
+                                <div class="text-3xl font-bold text-gray-800" id="success-rate">0%</div>
+                                <div class="text-sm text-gray-500">Agent Task Success Rate (Prometheus)</div>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-bold text-gray-800" id="cost-per-workflow">$0.00</div>
+                                <div class="text-sm text-gray-500">Avg. Cost per Workflow (FinOps KPI)</div>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-bold text-gray-800" id="total-queries">0</div>
+                                <div class="text-sm text-gray-500">Total Queries Run</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let isAgentDeployed = false;
+        let queryCount = 0;
+        let successfulQueries = 0;
+        let totalCost = 0;
+        const COST_PER_QUERY = 0.002; // Simulated cost per LLM call
+        const SQL_QUERY_COST = 0.0005; // Cheaper LLM path for translation only
+        const CONTEXT_QUERY_COST = 0.0001; // Cheapest LLM path for simple recall
+        const REPORT_QUERY_COST = 0.005; // Highest cost due to external processing
+        const GRAPH_QUERY_COST = 0.0008; // Cheaper than full LLM, more than SQL
+        const MULTI_AGENT_COST = 0.008; // High cost for orchestration and multiple LLM calls
+        let currentStep = 1;
+        let agentLearnedDeliveryZone = false; 
+        let contextualData = null; // NEW CONTEXT STATE
+        let uploadedDocumentCount = 0; // NEW DOCUMENT COUNT STATE
+        let agentType = 'SingleAgent'; // Default agent type
+
+        // --- WIZARD LOGIC ---
+        function showStep(step) {
+            if (isAgentDeployed) return; // Lock wizard after deployment
+
+            currentStep = step;
+            document.querySelectorAll('.wizard-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step-${step}`).classList.remove('hidden');
+
+            document.querySelectorAll('.wizard-step').forEach(el => {
+                const badgeStep = parseInt(el.id.split('-')[1]);
+                el.classList.remove('active');
+                if (badgeStep === step) {
+                    el.classList.add('active');
+                } else if (badgeStep < step) {
+                    el.classList.add('completed');
+                } else {
+                    el.classList.remove('completed');
+                }
+            });
+
+            const titles = {
+                1: 'Step 1: Define Agent - Name & Goal',
+                2: 'Step 2: Configure Memory - State & Context',
+                3: 'Step 3: Add Knowledge Base - RAG/Vector DB',
+                4: 'Step 4: Define Workflow - Multi-Step Logic',
+                5: 'Step 5: Set Policy - Governance Guardrail (OPA)',
+                6: 'Step 6: Review & Deploy - Initiate Golden Path'
+            };
+            document.getElementById('wizard-title').textContent = titles[step];
+        }
+
+        function nextStep() {
+            if (currentStep < 6) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        document.getElementById('access-level').addEventListener('change', (e) => {
+            const level = e.target.value;
+            const preview = document.getElementById('policy-preview');
+            if (level === 'READ_ONLY') {
+                preview.innerHTML = `<span class="font-bold text-sm">OPA Rego Policy Preview:</span><br>` +
+                                    `<code>package progenix.security</code> <br>` +
+                                    `<code>default allow = false</code> <br>` +
+                                    `<code class="text-red-600 font-bold">allow { input.method = "GET" }</code>`;
+            } else {
+                 preview.innerHTML = `<span class="font-bold text-sm">OPA Rego Policy Preview:</span><br>` +
+                                    `<code>package progenix.security</code> <br>` +
+                                    `<code class="text-green-600 font-bold">default allow = true</code> <br>` +
+                                    `<code>allow { true }</code>`;
+            }
+        });
+        
+        document.getElementById('agent-type').addEventListener('change', (e) => {
+            agentType = e.target.value;
+            const workflowLogic = document.getElementById('workflow-logic');
+            const agentName = document.getElementById('agent-name');
+            const agentGoal = document.getElementById('agent-goal');
+            
+            if (agentType === 'MultiAgent') {
+                // Change Step 4 workflow logic for Multi-Agent
+                workflowLogic.value = "1. INTAKE AGENT: Receives invoice data and validates basic fields (Tool: Validation Service)\n2. VALIDATION AGENT: Checks invoice amount against budget (Tool: Budget Service)\n3. IF Budget > Invoice AND Budget Check == OK\n4. THEN PAYMENT AGENT: Initiates payment (Tool: Payment Gateway Service)\n5. ELSE PAYMENT AGENT: Flags for human approval.";
+                agentName.value = "Invoice-to-Pay Manager Agent";
+                agentGoal.value = "Autonomously process vendor invoices from intake to payment, coordinating specialized sub-agents and ensuring budget compliance.";
+            } else {
+                // Revert to Single Agent (Order Status) logic
+                workflowLogic.value = "1. Call Order Lookup Service (GET /status)\n2. IF Status == 'Shipped' AND Time > 10 Days\n3. THEN Call External Email Service (POST /send-update)\n4. ELSE Return Status to User.";
+                agentName.value = "Order Status Agent";
+                agentGoal.value = "Provide real-time status updates for customer orders by querying the Order Lookup Service.";
+            }
+        });
+
+
+        // --- RESET LOGIC ---
+        function resetDemo() {
+            // Reset global state
+            isAgentDeployed = false;
+            queryCount = 0;
+            successfulQueries = 0;
+            totalCost = 0;
+            agentLearnedDeliveryZone = false; 
+            contextualData = null; // RESET CONTEXT
+            uploadedDocumentCount = 0; // RESET DOCUMENT COUNT
+            agentType = 'SingleAgent';
+
+            // Reset UI elements to initial state (Studio tab)
+            document.getElementById('deployment-log').innerHTML = '<p class="text-gray-400">Review configuration and initiate deployment...</p>';
+            document.getElementById('deploy-button').textContent = 'Initiate Golden Path Deployment';
+            document.getElementById('deploy-button').disabled = false;
+            
+            // Check for existence before accessing properties
+            const contextButton = document.getElementById('context-button');
+            if (contextButton) contextButton.disabled = false;
+
+
+            // Reset Metrics
+            document.getElementById('total-queries').textContent = '0';
+            document.getElementById('success-rate').textContent = '0%';
+            document.getElementById('cost-per-workflow').textContent = '$0.00';
+
+            // Reset Dashboard Logs
+            document.getElementById('opa-log').innerHTML = '<p class="text-gray-400">Awaiting policy violation events...</p>';
+            document.getElementById('jaeger-trace').innerHTML = '<p class="text-gray-400">Run a successful query in the Chat tab to see a trace.</p>';
+            
+            // Reset Chat Window
+            document.getElementById('chat-window').innerHTML = '<div class="text-sm text-center text-gray-500">Agent is active. Try a query below.</div>';
+
+            // Enable/Disable Tabs
+            document.querySelector('[data-tab="chat"]').disabled = true;
+            document.querySelector('[data-tab="dashboard"]').disabled = true;
+            
+            // Reset Configuration fields and Wizard state
+            document.getElementById('agent-name').disabled = false;
+            document.getElementById('agent-goal').disabled = false;
+            document.getElementById('agent-instructions').disabled = false; // ENABLE new field
+            
+            // Check for existence before accessing properties (Step 4 elements)
+            const workflowLogic = document.getElementById('workflow-logic');
+            if (workflowLogic) workflowLogic.disabled = false; // Enable workflow logic
+
+            document.getElementById('access-level').disabled = false;
+            document.getElementById('memory-selection').disabled = false;
+            document.getElementById('knowledge-selection').disabled = false;
+            document.getElementById('output-format').disabled = false; // Enable output format
+            document.getElementById('agent-type').disabled = false; // Enable Agent Type select
+            
+            // Re-run the change event to reset text values
+            document.getElementById('agent-type').value = 'SingleAgent';
+            document.getElementById('agent-type').dispatchEvent(new Event('change'));
+
+            // Reset Wizard to Step 1
+            showStep(1); 
+            
+            // Reset Tab focus to Studio
+            document.querySelector('.tab-button[data-tab="studio"]').click();
+             
+             // Reset Step 4 Connection Status
+            document.getElementById('connection-status').className = "ml-2 px-2 py-0.5 text-xs rounded-full bg-yellow-100 text-yellow-700";
+            document.getElementById('connection-status').textContent = "Awaiting Check";
+            
+            const checkConnectionButton = document.getElementById('check-connection-button');
+            if (checkConnectionButton) checkConnectionButton.disabled = false;
+
+            document.getElementById('api-spec-preview').classList.add('hidden');
+            
+            // Reset Step 3 Upload Status
+            document.getElementById('upload-status').textContent = 'Awaiting file selection...';
+            document.getElementById('upload-status').className = 'text-xs mt-2 text-gray-500';
+            const uploadButton = document.getElementById('upload-button');
+            if (uploadButton) {
+                uploadButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M5.5 13a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM12 4a3 3 0 100 6 3 3 0 000-6zM13.5 13a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM10 18a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd" fill-rule="evenodd" /></svg> Upload & Generate Embeddings`;
+                uploadButton.disabled = true;
+            }
+            const fileInput = document.getElementById('document-upload');
+            if (fileInput) fileInput.value = ''; // Clear file input
+        }
+        // -----------------------
+        
+        // --- STEP 3: RAG DOCUMENT UPLOAD LOGIC ---
+        document.getElementById('document-upload')?.addEventListener('change', (e) => {
+            const uploadButton = document.getElementById('upload-button');
+            if (e.target.files.length > 0) {
+                uploadButton.disabled = false;
+                document.getElementById('upload-status').textContent = `File selected: ${e.target.files[0].name}. Ready to process.`;
+                document.getElementById('upload-status').className = 'text-xs mt-2 text-gray-700 font-medium';
+            } else {
+                uploadButton.disabled = true;
+                document.getElementById('upload-status').textContent = 'Awaiting file selection...';
+                document.getElementById('upload-status').className = 'text-xs mt-2 text-gray-500';
+            }
+        });
+
+        function simulateDocumentUpload() {
+            const fileInput = document.getElementById('document-upload');
+            const uploadButton = document.getElementById('upload-button');
+            const uploadStatus = document.getElementById('upload-status');
+            
+            if (fileInput.files.length === 0) {
+                alert("Please select a file to upload first.");
+                return;
+            }
+
+            const fileName = fileInput.files[0].name;
+
+            uploadButton.disabled = true;
+            uploadButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 animate-spin" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v2a1 1 0 11-2 0V4a1 1 0 011-1zm0 14a1 1 0 01-1 1v-2a1 1 0 112 0v2a1 1 0 01-1 1zm0-10a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zm6.293 2.293a1 1 0 01-1.414 0l-1.414-1.414a1 1 0 111.414-1.414l1.414 1.414a1 1 0 010 1.414zM4.414 14.293a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414l-1.414 1.414a1 1 0 01-1.414 0zM14.293 15.586a1 1 0 01-1.414 0l-1.414-1.414a1 1 0 111.414-1.414l1.414 1.414a1 1 0 010 1.414zM5.586 4.414a1 1 0 010 1.414l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414z" clip-rule="evenodd" /></svg> Processing...`;
+            uploadStatus.textContent = `[1/3] Uploading ${fileName} to Cloud Storage...`;
+            uploadStatus.className = 'text-xs mt-2 text-blue-600 font-medium animate-pulse';
+
+            // Simulate embedding process
+            setTimeout(() => {
+                uploadStatus.textContent = `[2/3] Document chunked and embedding model called...`;
+            }, 1500);
+
+            setTimeout(() => {
+                uploadedDocumentCount++;
+                uploadStatus.textContent = `[3/3] Embeddings stored in VectorDB. (${uploadedDocumentCount} documents ready for RAG)`;
+                uploadStatus.className = 'text-xs mt-2 text-green-600 font-bold';
+                uploadButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0 7 7 0 01-14 0zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" /></svg> Upload Complete`;
+                uploadButton.disabled = false; // Allow further configuration
+                fileInput.value = ''; // Clear file selection
+            }, 3000);
+        }
+
+        // --- REPORT DOWNLOAD UTILITY ---
+        function generateReportDownload(format) {
+            let filename;
+            let mimeType;
+            let content;
+
+            const data = [
+                ["Date", "Product ID", "Region", "Sales ($)", "Units Sold"],
+                ["2025-07-01", "P-482", "North", "12000", "50"],
+                ["2025-07-05", "P-110", "South", "8500", "30"],
+                ["2025-07-10", "P-482", "West", "15000", "65"],
+                ["2025-07-15", "P-999", "East", "5200", "20"]
+            ];
+
+            if (format === 'EXCEL') {
+                // Use CSV extension for reliable browser download of structured data
+                filename = "Sales_Performance_Q3_2025.csv"; 
+                mimeType = 'text/csv;charset=utf-8;';
+                // Add BOM for better Excel compatibility
+                content = '\ufeff' + data.map(row => row.join(',')).join('\n'); 
+            } else if (format === 'PPT') {
+                // Simulate PPT content as text file
+                filename = "Sales_Summary_Q3_2025.txt";
+                mimeType = 'text/plain;charset=utf-8;';
+                content = "PROGENIX.AI REPORT SUMMARY (Confidential)\n\nSLIDE 1: Q3 Agent-Driven Sales Performance\n- Total Units Sold (Agent-Assisted): 165 units\n- Top Performing Product: P-482\n\nSLIDE 2: Growth Strategy\n- Recommendation: Increase ad spend in North and West regions based on agent analytics.";
+            } else { // JSON
+                filename = "Sales_Data.json";
+                mimeType = 'application/json;charset=utf-8;';
+                content = JSON.stringify(data.slice(1).map(row => ({
+                    date: row[0],
+                    product_id: row[1],
+                    sales: row[3],
+                    units: row[4]
+                })), null, 2);
+            }
+
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+
+            // Create a temporary link element and click it to trigger download
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            return { filename, url };
+        }
+
+        // --- STEP 4: TOOL CONNECTIVITY LOGIC ---
+        function checkToolConnection() {
+            const statusBadge = document.getElementById('connection-status');
+            const button = document.getElementById('check-connection-button');
+            const spinner = document.getElementById('spinner');
+            const preview = document.getElementById('api-spec-preview');
+            // Tool name is purely for simulation
+            const toolName = "Order Lookup Service & Report Generation Service"; 
+
+            button.disabled = true;
+            spinner.classList.remove('hidden');
+            statusBadge.textContent = 'Connecting...';
+            statusBadge.className = "ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700";
+            preview.classList.add('hidden');
+
+            setTimeout(() => {
+                spinner.classList.add('hidden');
+                
+                // Simulate successful service discovery and API doc pull
+                const isSuccessful = true; 
+                
+                if (isSuccessful) {
+                    statusBadge.textContent = 'Connection Successful (mTLS Ready)';
+                    statusBadge.className = "ml-2 px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700";
+                    
+                    // Explicitly showing the association and methods available to the agent
+                    preview.innerHTML = `<span class="font-bold text-gray-800">API Spec (OpenAPI) for ${toolName}:</span><br>` +
+                                        `<code class="text-gray-600">GET /api/v1/orders/status: Retrieve order tracking info.<br>POST /api/v1/orders/delete: Delete order record (requires FULL_ACCESS).<br>GET /api/v1/orders/analytics: Retrieve aggregated business metrics (e.g., total orders).</code>`;
+                    preview.classList.remove('hidden');
+                    
+                } else {
+                    statusBadge.textContent = 'Connection Failed';
+                    statusBadge.className = "ml-2 px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700";
+                    button.disabled = false; // Allow retry
+                }
+
+            }, 1500);
+        }
+
+        // Initialize policy preview and start at step 1
+        document.addEventListener('DOMContentLoaded', () => {
+            showStep(1);
+            document.getElementById('access-level').dispatchEvent(new Event('change'));
+            document.getElementById('agent-type').dispatchEvent(new Event('change'));
+        });
+
+
+        // --- UI UTILITIES ---
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+
+                // Update buttons
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Update content
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+                document.getElementById(targetTab).classList.remove('hidden');
+            });
+        });
+
+        function appendLog(elementId, message, className = '') {
+            const logElement = document.getElementById(elementId);
+            const entry = document.createElement('p');
+            entry.className = `mt-1 ${className}`;
+            // Use innerHTML when the message contains span tags for color formatting
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logElement.prepend(entry);
+        }
+
+        function updateMetrics(isSqlQuery = false, isContextQuery = false, isReportQuery = false, isGraphQuery = false, isMultiAgent = false) {
+            queryCount++;
+            let cost = COST_PER_QUERY;
+            if (isSqlQuery) {
+                 cost = SQL_QUERY_COST;
+            } else if (isContextQuery) {
+                 cost = CONTEXT_QUERY_COST;
+            } else if (isReportQuery) {
+                 cost = REPORT_QUERY_COST;
+            } else if (isGraphQuery) {
+                 cost = GRAPH_QUERY_COST;
+            } else if (isMultiAgent) {
+                 cost = MULTI_AGENT_COST;
+            }
+            totalCost += cost;
+
+            const successRate = queryCount > 0 ? ((successfulQueries / queryCount) * 100).toFixed(0) : 0;
+            
+            document.getElementById('total-queries').textContent = queryCount;
+            document.getElementById('success-rate').textContent = `${successRate}%`;
+            document.getElementById('cost-per-workflow').textContent = `$${(totalCost / queryCount).toFixed(4)}`;
+        }
+        
+        function addLearningButton(query) {
+             const chatWindow = document.getElementById('chat-window');
+             const buttonContainer = document.createElement('div');
+             buttonContainer.className = 'text-left mt-2';
+             buttonContainer.id = 'learning-button-container';
+             
+             buttonContainer.innerHTML = `
+                <p class="text-xs text-orange-500 mb-1">Human-in-the-Loop Required:</p>
+                <button onclick="simulateLearning('${query}')" 
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-1 px-3 rounded-lg transition duration-150 shadow-md text-xs flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 00-8 8c0 2.628.98 5.047 2.62 6.892.146.155.334.258.536.315C5.463 17.653 7.643 18 10 18a8 8 0 008-8 8 8 0 00-8-8zm1 11H9v-3h2v3zm0-4H9V6h2v3z"/></svg>
+                    Simulate MLOps Memory Update (Train Agent)
+                </button>
+             `;
+             chatWindow.appendChild(buttonContainer);
+             chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+        
+        function simulateLearning(query) {
+             agentLearnedDeliveryZone = true;
+             const container = document.getElementById('learning-button-container');
+             if (container) container.remove();
+             
+             const chatWindow = document.getElementById('chat-window');
+             chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-yellow-100 text-yellow-800 p-2 rounded-lg inline-block font-semibold">
+                [MLOps System] Agent memory updated via Redis. The new fact about '${query}' is now available for retrieval.
+             </span></div>`;
+             
+             appendLog('deployment-log', `[MLOPS] Agent memory updated (agentLearnedDeliveryZone=true).`, 'log-vault');
+             
+             chatWindow.innerHTML += `<div class="text-left text-sm mt-2"><span class="text-gray-600 p-2 rounded-lg inline-block">Please re-run your previous query to see the updated behavior.</span></div>`;
+             chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+
+        // --- OFFERING 1: NO-CODE STUDIO (Deployment Logic) ---
+        
+        function showBlueprintGeneration() {
+            const deploymentLog = document.getElementById('deployment-log');
+            const accessLevel = document.getElementById('access-level').value;
+            const outputFormat = document.getElementById('output-format').value;
+            const knowledgeBase = document.getElementById('knowledge-selection').value;
+            const currentAgentType = document.getElementById('agent-type').value;
+            const agentName = document.getElementById('agent-name').value;
+
+
+            let argoContent = '';
+            let argoTemplateName = `${agentName.toLowerCase().replace(/\s/g, '-')}-workflow`;
+
+            if (currentAgentType === 'MultiAgent') {
+                argoContent = `
+  # Argo Workflow: Invoice-to-Pay Orchestration (Multi-Agent)
+  - name: 1-intake-agent
+    template: intake-agent-tool
+  - name: 2-validation-agent
+    template: validation-agent-tool
+  - name: 3-payment-agent
+    template: payment-agent-tool
+`;
+            } else {
+                argoContent = `
+  # Argo Workflow: Single Agent Tool Chaining
+  - name: check-status
+    template: check-status-template
+  - name: send-notification
+    template: send-email-template
+`;
+            }
+
+
+            // --- SIMULATED BLUEPRINT GENERATION ---
+            const blueprintContent = `
+# Blueprint for ${agentName} (v1.0.0)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${agentName.toLowerCase().replace(/\s/g, '-')}-agent
+spec:
+  template:
+    spec:
+      containers:
+      - name: agent
+        image: progenix.registry/agent:latest
+        env:
+        # Vault Integration for LLM Key
+        - name: LLM_API_KEY
+          valueFrom: 
+            secretKeyRef:
+              name: agent-secrets
+              key: LLM_KEY
+---
+apiVersion: networking.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: ${agentName.toLowerCase().replace(/\s/g, '-')}-policy
+spec:
+  selector:
+    matchLabels:
+      app: ${agentName.toLowerCase().replace(/\s/g, '-')}-agent
+  action: ALLOW
+  rules:
+  # OPA Rego Policy: Configured by Studio
+  - to:
+    - operation:
+        methods: [${accessLevel === 'READ_ONLY' ? '"GET"' : '"*"'} ]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: ${argoTemplateName}
+spec:
+  entrypoint: main
+  templates:
+  # Argo Workflow Logic: Configured by Studio
+  - name: main
+    steps:
+    ${argoContent}
+`;
+
+            deploymentLog.innerHTML = '<p class="text-gray-400">Review complete. Generating Infrastructure-as-Code Blueprint...</p>';
+            deploymentLog.innerHTML += `<p class="text-sm text-gray-800 mt-2 font-bold">Generated 3 Manifests: K8s, OPA, and Argo Workflow...</p>`;
+            deploymentLog.innerHTML += `<div class="blueprint-code">${blueprintContent}</div>`;
+
+            // Continue deployment after a pause
+            setTimeout(() => {
+                deploymentLog.scrollTop = 0;
+                deployAgentPart2(accessLevel, knowledgeBase);
+            }, 3000);
+        }
+
+        function deployAgent() {
+            const deployButton = document.getElementById('deploy-button');
+            const status = document.getElementById('connection-status');
+            const knowledgeBase = document.getElementById('knowledge-selection').value;
+            
+            if (isAgentDeployed) {
+                alert("Agent is already deployed! Reset the page to re-demo.");
+                return;
+            }
+             if (!status.textContent.includes("Successful")) {
+                alert("Please successfully check the tool connection in Step 4 before deploying.");
+                return;
+            }
+            if (knowledgeBase !== 'None' && uploadedDocumentCount === 0) {
+                 alert("Please upload at least one document in Step 3 for the RAG/Graph demo.");
+                return;
+            }
+
+
+            deployButton.disabled = true;
+            deployButton.textContent = 'Generating Blueprint...';
+            
+            // --- Lock configuration fields after deployment initiated ---
+            document.getElementById('agent-name').disabled = true;
+            document.getElementById('agent-goal').disabled = true; 
+            document.getElementById('agent-instructions').disabled = true; 
+            document.getElementById('workflow-logic').disabled = true; 
+            document.getElementById('access-level').disabled = true;
+            document.getElementById('memory-selection').disabled = true;
+            document.getElementById('knowledge-selection').disabled = true;
+            document.getElementById('output-format').disabled = true; 
+            document.getElementById('agent-type').disabled = true; // Lock Agent Type
+            document.querySelectorAll('.wizard-step').forEach(el => el.classList.add('completed'));
+            document.getElementById('step-deploy-badge').classList.add('active');
+            // -----------------------------------------------------------------
+            
+            showBlueprintGeneration();
+        }
+
+        function deployAgentPart2(accessLevel, knowledgeBase) {
+            const deployLog = document.getElementById('deployment-log');
+            const deployButton = document.getElementById('deploy-button');
+
+            deployLog.innerHTML = '';
+            deployButton.textContent = 'Deploying...';
+
+            // 1. GitOps Sync
+            appendLog('deployment-log', `[GIT/CI] Blueprint committed. ArgoCD detected change and initiated sync.`, 'text-gray-800');
+
+            setTimeout(() => {
+                // 2. Policy Enforcement & Container Deployment
+                appendLog('deployment-log', `[K8s] <span class="font-bold">Agent Container scheduled in Kubernetes Pod.</span>`, 'text-gray-800');
+                appendLog('deployment-log', `<span class="log-istio">Istio Sidecar injected (mTLS enabled) & OPA Policy loaded.</span>`, 'text-gray-800');
+            }, 1000);
+
+            setTimeout(() => {
+                // 3. Vault Injection (Offer 2B)
+                appendLog('deployment-log', `[K8s] Agent Pod authenticated via Service Account. <span class="log-vault">Successfully fetched LLM Key from Vault.</span>`, 'text-gray-800');
+            }, 2000);
+
+            setTimeout(() => {
+                // Deployment Complete
+                isAgentDeployed = true;
+                deployButton.textContent = 'Agent Deployed Successfully!';
+                document.querySelector('[data-tab="chat"]').disabled = false;
+                document.querySelector('.tab-button[data-tab="chat"]').click(); // Automatically switch to chat
+                document.querySelector('[data-tab="dashboard"]').disabled = false;
+                appendLog('deployment-log', `[PLATFORM] Agent deployed with ${accessLevel} policy and RAG via ${knowledgeBase}.`, 'log-success font-bold');
+            }, 3000);
+        }
+
+        
+        // --- OFFERING 2 & 3: AGENT CHAT & RUNTIME AUDIT ---
+
+        function simulateTrace(type, policyViolation = false) {
+            const jaeger = document.getElementById('jaeger-trace');
+            jaeger.innerHTML = '';
+            
+            // Function to generate a trace span
+            const createSpan = (name, duration, color, delay) => {
+                const durationMs = duration * 100;
+                const container = document.createElement('div');
+                container.className = 'trace-entry';
+
+                // Label on the left
+                const label = document.createElement('span');
+                label.className = 'trace-label';
+                label.textContent = name;
+                container.appendChild(label);
+
+                // Visual Bar representation
+                const barContainer = document.createElement('div');
+                barContainer.className = 'trace-bar-container';
+                
+                const bar = document.createElement('div');
+                bar.className = `trace-bar ${color} transition-all duration-700 ease-out`;
+                bar.style.width = '0%';
+                bar.textContent = `${durationMs}ms`;
+
+                // Apply width animation
+                const maxDuration = 20; // Max duration to calculate % width
+                const percentage = Math.min(100, (duration / maxDuration) * 100);
+
+                setTimeout(() => {
+                    bar.style.width = `${percentage}%`;
+                }, delay + 50);
+
+                barContainer.appendChild(bar);
+                container.appendChild(barContainer);
+
+                return container;
+            };
+
+            // Common Steps
+            jaeger.appendChild(createSpan('1. User Query Received', 4, 'bg-gray-500', 0));
+
+            if (type === 'REPORT') {
+                // --- REPORT GENERATION PATH (Highest Cost/Resource) ---
+                jaeger.appendChild(createSpan('2. Agent Reasoning (LLM/LangChain)', 15, 'bg-indigo-600', 100));
+                const opaSpan = createSpan('3. Policy Check (Istio -> OPA)', 5, 'bg-purple-600', 300);
+                jaeger.appendChild(opaSpan);
+
+                setTimeout(() => {
+                    // 4. Report Service Execution (mTLS)
+                    jaeger.appendChild(createSpan('4. Tool Call (Report Generation Service)', 10, 'bg-orange-600', 800));
+                    
+                    // 5. External Heavy Processing
+                    jaeger.appendChild(createSpan('5. Data Processing & File Output', 20, 'bg-red-700', 1000));
+                     // 6. Final Response
+                    setTimeout(() => {
+                        jaeger.appendChild(createSpan('6. Final Response to User', 3, 'bg-gray-500', 1400));
+                    }, 1800);
+                }, 500);
+            }
+            else if (type === 'SQL') {
+                // --- EFFICIENT SQL PATH (Minimal LLM Use) ---
+                jaeger.appendChild(createSpan('2. LLM Translation (Low-Cost)', 5, 'bg-lime-600', 100)); // Quick LLM translation
+                
+                const opaSpan = createSpan('3. Policy Check (Istio -> OPA)', 5, 'bg-purple-600', 300);
+                jaeger.appendChild(opaSpan);
+
+                setTimeout(() => {
+                    // 4. Direct Tool Execution (API Call)
+                    jaeger.appendChild(createSpan('4. Direct Tool Call (GET /analytics)', 8, 'bg-green-600', 800));
+                    
+                    // 5. Database Interaction
+                    jaeger.appendChild(createSpan('5. Data Fetch (SQL DB)', 12, 'bg-yellow-600', 900));
+                     // 6. Final Response
+                    setTimeout(() => {
+                        jaeger.appendChild(createSpan('6. Final Response to User', 3, 'bg-gray-500', 1200));
+                    }, 1500);
+                }, 500);
+            } else if (type === 'GRAPH') {
+                // --- GRAPH RAG OPTIMIZATION PATH ---
+                jaeger.appendChild(createSpan('2. LLM Translation (Low-Cost / Cypher Generation)', 5, 'bg-lime-600', 100));
+                
+                const opaSpan = createSpan('3. Policy Check (Istio -> OPA)', 5, 'bg-purple-600', 300);
+                jaeger.appendChild(opaSpan);
+
+                setTimeout(() => {
+                    // 4. Execute Graph Query (Cypher)
+                    jaeger.appendChild(createSpan('4. Execute Graph Query (Cypher/Neo4j)', 15, 'bg-pink-600', 800));
+                    
+                    // 5. Synthesis
+                    jaeger.appendChild(createSpan('5. Synthesis from Graph Results', 10, 'bg-gray-500', 1200));
+                     // 6. Final Response
+                    setTimeout(() => {
+                        jaeger.appendChild(createSpan('6. Final Response to User', 3, 'bg-gray-500', 1500));
+                    }, 1800);
+                }, 500);
+            } else if (type === 'MULTI_AGENT') {
+                // --- MULTI-AGENT INVOICE-TO-PAY WORKFLOW ---
+                jaeger.appendChild(createSpan('2. Manager Agent Reasoning (Argo Trigger)', 8, 'bg-indigo-600', 100));
+                
+                // Step 1: Intake Agent
+                jaeger.appendChild(createSpan('3a. Sub-Agent 1: Intake/Validation (Tool Call)', 10, 'bg-purple-500', 500));
+                
+                // Step 2: Budget Agent
+                jaeger.appendChild(createSpan('3b. Sub-Agent 2: Budget Check (Tool Call)', 12, 'bg-purple-700', 900));
+                
+                // Step 3: Conditional Decision
+                jaeger.appendChild(createSpan('4. Argo Decision: IF Budget OK', 4, 'bg-gray-500', 1300));
+
+                // Step 4: Payment Agent
+                jaeger.appendChild(createSpan('5. Sub-Agent 3: Payment Initiation (Tool Call)', 15, 'bg-green-700', 1600));
+
+                // Final Response
+                setTimeout(() => {
+                    jaeger.appendChild(createSpan('6. Manager Agent Final Confirmation', 3, 'bg-gray-500', 2000));
+                }, 2200);
+
+
+            } else if (type === 'CONTEXT') {
+                 // --- EFFICIENT CONTEXT RECALL PATH (Cheapest LLM Use) ---
+                jaeger.appendChild(createSpan('2. LLM Context Check (Cheapest)', 3, 'bg-orange-600', 100));
+                jaeger.appendChild(createSpan('3. Data Retrieval (Context Buffer)', 4, 'bg-orange-400', 300));
+                 // 4. Final Response
+                setTimeout(() => {
+                    jaeger.appendChild(createSpan('4. Final Response to User', 3, 'bg-gray-500', 800));
+                }, 1000);
+
+            } else if (policyViolation) {
+                // --- DENY PATH ---
+                jaeger.appendChild(createSpan('2. Agent Reasoning (LLM/LangChain)', 15, 'bg-indigo-600', 100));
+                const opaSpan = createSpan('3. Policy Check (Istio -> OPA)', 5, 'bg-purple-600', 300);
+                jaeger.appendChild(opaSpan);
+
+                setTimeout(() => {
+                    opaSpan.classList.remove('bg-purple-600');
+                    opaSpan.classList.add('bg-red-600', 'font-bold');
+                    opaSpan.textContent = '3. POLICY DENIED (OPA)';
+                }, 1000);
+                 // 6. Final Response
+                setTimeout(() => {
+                    jaeger.appendChild(createSpan('6. Final Response to User', 3, 'bg-gray-500', 1200));
+                }, 1200);
+
+            } else if (type === 'WORKFLOW') {
+                // --- WORKFLOW PATH (Argo Logic) ---
+                jaeger.appendChild(createSpan('2. Agent Reasoning (LLM/LangChain)', 10, 'bg-indigo-600', 100));
+                
+                // Tool 1
+                jaeger.appendChild(createSpan('3a. Policy Check: Step 1 (GET /status)', 5, 'bg-purple-600', 300));
+                jaeger.appendChild(createSpan('3b. Execute Tool 1: Order Status Lookup', 10, 'bg-green-600', 500));
+                
+                // Conditional Logic
+                jaeger.appendChild(createSpan('4. Workflow Decision (Argo Logic)', 4, 'bg-gray-500', 700));
+
+                // Tool 2 (Conditional)
+                jaeger.appendChild(createSpan('5a. Policy Check: Step 2 (POST /send-update)', 5, 'bg-purple-600', 900));
+                jaeger.appendChild(createSpan('5b. Execute Tool 2: Email Notification', 8, 'bg-blue-600', 1100));
+                
+                // Final Response
+                setTimeout(() => {
+                    jaeger.appendChild(createSpan('6. Final Response to User', 3, 'bg-gray-500', 1500));
+                }, 1800);
+
+            } else if (type === 'TOOL' || type === 'RAG') {
+                // --- SUCCESSFUL SIMPLE TOOL, RAG, or GRAPH UPDATE USE ---
+                jaeger.appendChild(createSpan('2. Agent Reasoning (LLM/LangChain)', 15, 'bg-indigo-600', 100));
+                
+                if (type === 'RAG') {
+                    // RAG specific steps
+                    jaeger.appendChild(createSpan('3. Context Retrieval (Vector DB Lookup)', 10, 'bg-cyan-600', 300));
+                    jaeger.appendChild(createSpan('4. Embedding/Reranking (Embedding Service)', 7, 'bg-blue-400', 600));
+                    jaeger.appendChild(createSpan('5. Final Synthesis', 5, 'bg-gray-500', 1000));
+                    
+                } else { // Simple Tool (GET/POST)
+                    const opaSpan = createSpan('3. Policy Check (Istio -> OPA)', 5, 'bg-purple-600', 300);
+                    jaeger.appendChild(opaSpan);
+                    
+                    // Tool Execution
+                    jaeger.appendChild(createSpan('4. Tool Call (mTLS Service Identity Check)', 8, 'bg-green-600', 800));
+                    jaeger.appendChild(createSpan('5. Data Fetch/Update (Mock DB)', 12, 'bg-yellow-600', 900));
+                }
+                
+                // Final Response (Common)
+                setTimeout(() => {
+                    jaeger.appendChild(createSpan('6. Final Response to User', 3, 'bg-gray-500', type === 'RAG' ? 1200 : 1500));
+                }, 1800);
+                
+            } else if (type === 'LEARNED') {
+                // --- SUCCESSFUL LEARNING RECALL ---
+                jaeger.appendChild(createSpan('2. Agent Reasoning (LLM/LangChain)', 15, 'bg-indigo-600', 100));
+                
+                // 3. Redis Memory Lookup
+                jaeger.appendChild(createSpan('3. Memory Recall (Redis Cache)', 5, 'bg-orange-600', 300));
+                
+                // 4. Synthesis
+                jaeger.appendChild(createSpan('4. Synthesis & Response', 8, 'bg-gray-500', 500));
+
+                // 5. Final Response
+                setTimeout(() => {
+                    jaeger.appendChild(createSpan('5. Final Response to User', 3, 'bg-gray-500', 1000));
+                }, 1500);
+            }
+        }
+
+
+        function sendQuery() {
+            if (!isAgentDeployed) {
+                alert("Please deploy the agent in the Studio tab first.");
+                return;
+            }
+
+            const queryInput = document.getElementById('user-query');
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            const chatWindow = document.getElementById('chat-window');
+            const accessLevel = document.getElementById('access-level').value; 
+            const knowledgeBase = document.getElementById('knowledge-selection').value;
+            const instructions = document.getElementById('agent-instructions').value; 
+            const outputFormat = document.getElementById('output-format').value;
+            const currentAgentType = document.getElementById('agent-type').value;
+
+
+            // Check if Affirmative Rule is in effect
+            const affirmativeRuleActive = instructions.toLowerCase().includes("affirmative sentences");
+
+
+            // Clear input and append user message
+            queryInput.value = '';
+            chatWindow.innerHTML += `<div class="text-right text-sm"><span class="bg-indigo-100 text-indigo-800 p-2 rounded-lg inline-block">${query}</span></div>`;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            
+            // Remove any old learning button
+            const oldContainer = document.getElementById('learning-button-container');
+            if (oldContainer) oldContainer.remove();
+
+
+            const lowerQuery = query.toLowerCase();
+            // Query Type detection
+            const isDeleteAttempt = lowerQuery.includes("cancel") || lowerQuery.includes("delete") || lowerQuery.includes("can you delete");
+            const isReportQuery = lowerQuery.includes("generate") && lowerQuery.includes("report");
+            const isWorkflowQuery = lowerQuery.includes("follow up") || lowerQuery.includes("check on order 54321");
+            const isLearningAttempt = lowerQuery.includes("delivery zones");
+            const isSqlQuery = lowerQuery.includes("total how many orders") || lowerQuery.includes("orders last 6 months");
+            const isContextQuery = lowerQuery.includes("shipping cutoff");
+            const isGraphUpdate = lowerQuery.includes("connect product p-482") || lowerQuery.includes("new supplier");
+            const isGraphQuery = lowerQuery.includes("supplier risk") || lowerQuery.includes("product p-482");
+            const isMultiAgentQuery = lowerQuery.includes("process invoice") && currentAgentType === 'MultiAgent';
+            const isRAGAttempt = lowerQuery.includes("policy") || lowerQuery.includes("refund");
+
+
+            // --- Update Metrics ---
+            updateMetrics(isSqlQuery, isContextQuery, isReportQuery, isGraphQuery, isMultiAgentQuery);
+
+
+            // Simulate Agent thinking
+            chatWindow.innerHTML += `<div class="text-left text-sm flex items-center"><svg class="animate-spin h-5 w-5 text-gray-500 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="text-gray-500">Agent is reasoning...</span></div>`;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            setTimeout(() => {
+                // Remove thinking indicator
+                chatWindow.lastElementChild.remove();
+                
+                if (isMultiAgentQuery) {
+                    // --- MULTI-AGENT WORKFLOW PATH ---
+                    const multiAgentMessage = `<span class="font-bold text-lg log-multi-agent">Multi-Agent Workflow Complete!</span><br>The **Invoice-to-Pay Manager Agent** successfully coordinated sub-agents to validate budget and initiate payment for Invoice 99201.`;
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-purple-100 text-purple-800 p-2 rounded-lg inline-block font-semibold">${multiAgentMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('MULTI_AGENT', false);
+                    appendLog('opa-log', `[MANAGER-AGENT] Multi-Agent Workflow SUCCESS. Cost: $${MULTI_AGENT_COST}.`, 'log-multi-agent');
+                
+                } else if (isContextQuery && contextualData) {
+                    // --- CONTEXT RECALL PATH (Cheapest, Fastest) ---
+                    const contextMessage = `Based on the latest <span class="text-orange-600 font-bold">session context provided</span>, the holiday shipping cutoff is **3 PM EST, December 18th**. This was retrieved from the ephemeral context buffer.`;
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-orange-100 text-orange-800 p-2 rounded-lg inline-block font-semibold">${contextMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('CONTEXT', false);
+                    appendLog('opa-log', `[AGENT-status-v1] Efficient Context Recall. Action: Context Buffer Lookup.`, 'log-vault');
+
+
+                } else if (isReportQuery) {
+                    // --- REPORT GENERATION PATH ---
+                    const { filename } = generateReportDownload(outputFormat);
+                    const reportMessage = `<span class="font-bold text-lg text-orange-700">Report Generated!</span><br>The **Report Generation Service** has processed the data. The file <code>${filename}</code> is now downloading. (High-cost, external processing validated.)`;
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-orange-100 text-orange-800 p-2 rounded-lg inline-block font-semibold">${reportMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('REPORT', false);
+                    appendLog('opa-log', `[AGENT-status-v1] High-Resource Action. Action: GET /reports/sales. Cost: $${REPORT_QUERY_COST}.`, 'log-vault');
+
+                } else if (isSqlQuery) {
+                    // --- EFFICIENT SQL PATH LOGIC ---
+                    const translation = "SELECT COUNT(*) FROM orders WHERE date > now() - interval '6 months'";
+                    const successMessage = `<span class="font-bold text-lg text-lime-700">Efficiency Optimized!</span><br>Query translated to: <code>${translation}</code>.<br>Result: <span class="font-bold">12,451 orders</span> were processed in the last 6 months. (Direct database query executed, minimal LLM cost incurred.)`;
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-lime-100 text-lime-800 p-2 rounded-lg inline-block font-semibold">${successMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('SQL', false);
+                    appendLog('opa-log', `[AGENT-status-v1] Optimized Query PATH. Action: GET /analytics.`, 'log-sql');
+                
+                } else if (isGraphUpdate && knowledgeBase.includes('GraphDB')) {
+                    // --- GRAPH UPDATE PATH (Demonstrates Write Operation) ---
+                    const graphUpdateMessage = `<span class="font-bold text-lg text-amber-700">Graph Relationship Updated!</span><br>The agent successfully executed the **Cypher Graph Query** to create the new relationship: <code>CREATE (p:P482)-[:SUPPLIED_BY]->(s:EcoTech Inc.)</code>. (Autonomous data update complete.)`;
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-amber-100 text-amber-800 p-2 rounded-lg inline-block font-semibold">${graphUpdateMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('TOOL', false); // Using TOOL trace but highlighting it's a POST/Update
+                    appendLog('opa-log', `[AGENT-status-v1] Graph Update SUCCESS. Action: POST /supplier/update-relationship.`, 'log-graph');
+
+                } else if (isGraphQuery && knowledgeBase.includes('GraphDB')) {
+                    // --- GRAPH RAG OPTIMIZATION PATH (Retrieval) ---
+                    const graphMessage = `<span class="font-bold text-lg text-amber-700">Analytical Insight Generated!</span><br>The agent translated your query into a **Cypher Graph Query**.<br>Result: Product P-482 has a **High Risk** flag due to a dependency on Vendor Y in Region Z (conflict zone). (Relational data synthesized from Neo4j.)`;
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-amber-100 text-amber-800 p-2 rounded-lg inline-block font-semibold">${graphMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('GRAPH', false);
+                    appendLog('opa-log', `[AGENT-status-v1] Optimized GRAPH PATH. Action: Execute Cypher Query. Cost: $${GRAPH_QUERY_COST}.`, 'log-graph');
+
+                } else if (isDeleteAttempt && accessLevel === 'READ_ONLY') {
+                    // --- POLICY VIOLATION & INSTRUCTIONS ---
+                    
+                    let denialCore = "I am able to provide real-time status updates, but I am unable to modify records. Your policy restricts me to read-only operations.";
+                    if (affirmativeRuleActive) {
+                         // Affirmative response based on the instruction
+                         denialCore = "I am able to provide real-time status updates, but I am unable to modify records. Your policy restricts me to read-only operations.";
+                    }
+                    
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-red-100 text-red-800 p-2 rounded-lg inline-block font-semibold">${denialCore}</span></div>`;
+                    
+                    appendLog('opa-log', `[AGENT-status-v1] Policy Check FAILED on DELETE /order. Reason: READ_ONLY_GUARDRAIL (Behavior influenced by instructions).`, 'log-deny');
+                    simulateTrace('TOOL', true);
+
+                } else if (isWorkflowQuery) {
+                    // --- WORKFLOW PATH (Argo Logic) ---
+                    const workflowMessage = `<span class="font-bold text-lg text-purple-700">Workflow Triggered!</span><br>The agent executed the multi-step workflow logic: 1. Checked Order Status (Shipped). 2. Triggered Conditional IF. 3. Sent Customer Notification via External Email Service.`;
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-purple-100 text-purple-800 p-2 rounded-lg inline-block font-semibold">${workflowMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('WORKFLOW', false);
+                    appendLog('opa-log', `[AGENT-status-v1] Workflow SUCCESS. Action: Multi-step orchestration executed.`, 'log-success');
+
+                } else if (isLearningAttempt && agentLearnedDeliveryZone) {
+                    // --- LEARNING SUCCESS (Recall) ---
+                    const successMessage = "I see! The new delivery zone 'Sector Gamma' was added to memory. Shipments to this zone are now enabled. (Fact recalled from Redis Memory)";
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-orange-100 text-orange-800 p-2 rounded-lg inline-block font-semibold">${successMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('LEARNED', false);
+                    appendLog('opa-log', `[AGENT-status-v1] Successful recall from Redis Memory. Action: Allowed.`, 'log-success');
+                
+                } else if (isLearningAttempt && !agentLearnedDeliveryZone) {
+                    // --- LEARNING FAILURE (Trigger) ---
+                    const failureMessage = "I apologize, that information is not currently available in my memory or tools. A supervisor has been notified of this data gap.";
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-red-100 text-red-800 p-2 rounded-lg inline-block font-semibold">${failureMessage}</span></div>`;
+                    
+                    addLearningButton(query);
+                    simulateTrace('RAG', false); 
+
+                } else if (isRAGAttempt && knowledgeBase.includes('VectorDB')) {
+                    // --- RAG SUCCESS DEMO (Showcasing KB) ---
+                    const ragMessage = "Based on the retrieved Customer FAQs document from the Vector Database, our refund policy states items can be returned within 30 days if unused, subject to a 10% restocking fee. Please initiate a return via the main portal.";
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-cyan-100 text-cyan-800 p-2 rounded-lg inline-block font-semibold">${ragMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('RAG', false);
+                    appendLog('opa-log', `[AGENT-status-v1] Retrieval success. Action: VectorDB Lookup.`, 'log-success');
+
+                } else if (isDeleteAttempt && accessLevel === 'FULL_ACCESS') {
+                    // --- DELETE SUCCESS (Policy Configurable) ---
+                    const successMessage = "Order 123 has been successfully canceled and audited. Your policy allows this modification.";
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-green-100 text-green-800 p-2 rounded-lg inline-block font-semibold">${successMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('TOOL', false);
+                    appendLog('opa-log', `[AGENT-status-v1] Policy Check PASSED on DELETE /order. Action: Allowed.`, 'log-success');
+                
+                } else {
+                    // --- SUCCESSFUL READ (Tool Use) ---
+                    const successMessage = "Your order #12345 is currently in transit and is expected to arrive within 24 hours. (Data retrieved securely via OrderLookupService)";
+                    chatWindow.innerHTML += `<div class="text-left text-sm"><span class="bg-green-100 text-green-800 p-2 rounded-lg inline-block">${successMessage}</span></div>`;
+                    successfulQueries++;
+                    simulateTrace('TOOL', false);
+                    appendLog('opa-log', `[AGENT-status-v1] Policy Check PASSED on GET /status. Action: Allowed.`, 'log-success');
+                }
+                
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                
+                const currentCost = totalCost.toFixed(4);
+                appendLog('deployment-log', `[RUNTIME] Query #${queryCount} executed. Cost type: ${isSqlQuery ? 'SQL_OPTIMIZED' : isContextQuery ? 'CONTEXT_RECALL' : isReportQuery ? 'REPORT_RESOURCE' : isGraphQuery ? 'GRAPH_OPTIMIZED' : isMultiAgentQuery ? 'MULTI_AGENT' : 'FULL_LLM'}. Current total cost: $${currentCost}.`, 'text-gray-700');
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
